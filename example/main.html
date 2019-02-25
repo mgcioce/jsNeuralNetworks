@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="utf-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <title>Page Title</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+   
+</head>
+<body>
+    <input type="color" value="#FF0000">
+    <div class="container" id="example">
+        <h1>Example Text</h1>
+    </div>
+
+    <script src="https://unpkg.com/brain.js@1.1.2/browser.min.js"></script>
+    <script>
+            function getRgb(hex) {
+                var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+                hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+                    return r + r + g + g + b + b;
+                });
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: Math.round(parseInt(result[1], 16) / 2.55) / 100,
+                    g: Math.round(parseInt(result[2], 16) / 2.55) / 100,
+                    b: Math.round(parseInt(result[3], 16) / 2.55) / 100,
+                } : null;
+            }
+        </script>
+    <script>
+        const input = document.querySelector("input")
+        const example = document.querySelector("#example")
+
+        input.addEventListener("change", (e) => {
+        example.style.background = e.target.value
+
+        const rgb = getRgb(e.target.value);
+        console.log(rgb);
+
+        const neuralNet = new brain.NeuralNetwork()
+        
+        neuralNet.train([
+            {input: {r: 1, g: 0, b: 0}, output: { light: 1}},
+            {input: {r: 0, g: 1, b: 0}, output: {dark:1 }},
+            {input: {r: 0, g: 0, b: 1}, output: {dark:1}},
+            {input: {r: 1, g: 1, b: 1}, output: {dark:1}},
+            {input: {r: 0, g: 0, b: 0}, output: { light:1}},
+            {input: {r: 0.5,g: 0, b: 0}, output: { light:1}},
+            {input: {r: 0, g: 0.5, b: 0}, output: {dark: 1}},
+            {input: {r: 0, g: 0, b: 0.5}, output: {dark: 1}},
+            {input: {r: 0.5, g: 0.5, b: 0.5}, output: {dark: 1}},
+            {input: {r: 1, g: 1, b: 0}, output: {dark: 1}},
+            {input: {r: 0, g: 1, b: 1}, output: {dark: 1}},
+            {input: {r: 1, g: 0, b: 1}, output: {dark: 1}}
+        ])
+
+        const result = brain.likely(rgb, neuralNet)
+        example.style.color = result === "dark" ? "white" : "black"
+        console.log(result);
+
+   })
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+<!-- const rgb = getRGB
+           console.log(rgb); -->
